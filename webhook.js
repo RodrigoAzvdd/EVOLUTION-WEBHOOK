@@ -7,6 +7,7 @@ app.use(express.json());
 const API_URL = 'http://localhost:3005';
 const API_KEY = '429683C4C977415CAAFCCE10F7D57E11'; // Confirme se é o seu API key correto
 const INSTANCE_NAME = 'RODRIGO';
+const TARGET_NUMBER = '558594350030@s.whatsapp.net'; // Número específico para envio
 
 // Armazena o histórico de conversas (limpeza após 10 minutos)
 const conversationHistory = new Map();
@@ -37,25 +38,25 @@ app.post('/webhook', (req, res) => {
         const userHistory = conversationHistory.get(numero) || { initialGreetingSent: false, timestamp: Date.now() };
         let updatedHistory = { ...userHistory, timestamp: Date.now() };
 
-        if (textoRecebido === '4') {
-            conversationHistory.delete(numero);
-            enviarMensagem(numero, `Tchau, ${nome}! Foi um prazer ajudar. Quando quiser, é só voltar! 👋`);
-        } else if (!userHistory.initialGreetingSent) {
-            enviarMensagem(numero, `Olá, ${nome}! Como posso ajudar você hoje? 😊`);
-            setTimeout(() => {
+        if (numero === TARGET_NUMBER) {
+            if (textoRecebido === '4') {
+                conversationHistory.delete(numero);
+                enviarMensagem(numero, `Tchau, ${nome}! Foi um prazer ajudar. Quando quiser, é só voltar! 👋`); 
+            } else if (!userHistory.initialGreetingSent) {
+                enviarMensagem(numero, `Olá, ${nome}! Como posso ajudar você hoje? 😊`);
                 enviarMensagem(numero, `Descubra mais sobre mim:\n1️⃣ Digite 1 para saber o que eu faço\n2️⃣ Digite 2 para explorar serviços\n3️⃣ Digite 3 para entrar em contato\n4️⃣ Digite 4 para sair`);
-            }, 1000); // Pequeno delay para melhor experiência
-            updatedHistory.initialGreetingSent = true;
-            conversationHistory.set(numero, updatedHistory);
-        } else {
-            if (textoRecebido === '1') {
-                enviarMensagem(numero, `Oi, ${nome}! Eu sou um assistente criado com a Evolution API, usando um webhook poderoso para responder mensagens automaticamente. Transformo interações em algo dinâmico e personalizado, tudo direto do WhatsApp! 🚀`);
-            } else if (textoRecebido === '2') {
-                enviarMensagem(numero, `Ótima escolha, ${nome}! Estou explorando serviços incríveis – em breve, trarei opções como automações e suporte personalizado. Fique ligado! ✨`);
-            } else if (textoRecebido === '3') {
-                enviarMensagem(numero, `Que tal conversarmos, ${nome}? Envie sua dúvida ou ideia, e te ajudarei com um toque especial de inovação! 📩`);
+                updatedHistory.initialGreetingSent = true;
+                conversationHistory.set(numero, updatedHistory);
             } else {
-                enviarMensagem(numero, `Olá, ${nome}! Não reconheci seu comando. Tente:\n1️⃣ O que eu faço\n2️⃣ Serviços\n3️⃣ Contato\n4️⃣ Sair`);
+                if (textoRecebido === '1') {
+                    enviarMensagem(numero, `Oi, ${nome}! Eu sou um assistente criado com a Evolution API, usando um webhook poderoso para responder mensagens automaticamente. Transformo interações em algo dinâmico e personalizado, tudo direto do WhatsApp! 🚀`);
+                } else if (textoRecebido === '2') {
+                    enviarMensagem(numero, `Ótima escolha, ${nome}! Estou explorando serviços incríveis – em breve, trarei opções como automações e suporte personalizado. Fique ligado! ✨`);
+                } else if (textoRecebido === '3') {
+                    enviarMensagem(numero, `Que tal conversarmos, ${nome}? Envie sua dúvida ou ideia, e te ajudarei com um toque especial de inovação! 📩`);
+                } else {
+                    enviarMensagem(numero, `Olá, ${nome}! Não reconheci seu comando. Tente:\n1️⃣ O que eu faço\n2️⃣ Serviços\n3️⃣ Contato\n4️⃣ Sair`);
+                }
             }
         }
     }
@@ -77,23 +78,25 @@ app.post('/webhook/messages-upsert', (req, res) => {
         const userHistory = conversationHistory.get(numero) || { initialGreetingSent: false, timestamp: Date.now() };
         let updatedHistory = { ...userHistory, timestamp: Date.now() };
 
-        if (textoRecebido === '4') {
-            conversationHistory.delete(numero);
-            enviarMensagem(numero, `Tchau, ${nome}! Foi um prazer ajudar. Quando quiser, é só voltar! 👋`);
-        } else if (!userHistory.initialGreetingSent) {
-            enviarMensagem(numero, `Olá, ${nome}! Como posso ajudar você hoje? 😊`);
-            enviarMensagem(numero, `Descubra mais sobre mim:\n1️⃣ Digite 1 para saber o que eu faço\n2️⃣ Digite 2 para explorar serviços\n3️⃣ Digite 3 para entrar em contato\n4️⃣ Digite 4 para sair`);
-            updatedHistory.initialGreetingSent = true;
-            conversationHistory.set(numero, updatedHistory);
-        } else {
-            if (textoRecebido === '1') {
-                enviarMensagem(numero, `Oi, ${nome}! Eu sou um assistente criado com a Evolution API, usando um webhook poderoso para responder mensagens automaticamente. Transformo interações em algo dinâmico e personalizado, tudo direto do WhatsApp! 🚀`);
-            } else if (textoRecebido === '2') {
-                enviarMensagem(numero, `Ótima escolha, ${nome}! Estou explorando serviços incríveis – em breve, trarei opções como automações e suporte personalizado. Fique ligado! ✨`);
-            } else if (textoRecebido === '3') {
-                enviarMensagem(numero, `Que tal conversarmos, ${nome}? Envie sua dúvida ou ideia, e te ajudarei com um toque especial de inovação! 📩`);
+        if (numero === TARGET_NUMBER) {
+            if (textoRecebido === '4') {
+                conversationHistory.delete(numero);
+                enviarMensagem(numero, `Tchau, ${nome}! Foi um prazer ajudar. Quando quiser, é só voltar! 👋`);
+            } else if (!userHistory.initialGreetingSent) {
+                enviarMensagem(numero, `Olá, ${nome}! Como posso ajudar você hoje? 😊`);
+                enviarMensagem(numero, `Descubra mais sobre mim:\n1️⃣ Digite 1 para saber o que eu faço\n2️⃣ Digite 2 para explorar serviços\n3️⃣ Digite 3 para entrar em contato\n4️⃣ Digite 4 para sair`);
+                updatedHistory.initialGreetingSent = true;
+                conversationHistory.set(numero, updatedHistory);
             } else {
-                enviarMensagem(numero, `Olá, ${nome}! Não reconheci seu comando. Tente:\n1️⃣ O que eu faço\n2️⃣ Serviços\n3️⃣ Contato\n4️⃣ Sair`);
+                if (textoRecebido === '1') {
+                    enviarMensagem(numero, `Oi, ${nome}! Eu sou um assistente criado com a Evolution API, usando um webhook poderoso para responder mensagens automaticamente. Transformo interações em algo dinâmico e personalizado, tudo direto do WhatsApp! 🚀`);
+                } else if (textoRecebido === '2') {
+                    enviarMensagem(numero, `Ótima escolha, ${nome}! Estou explorando serviços incríveis – em breve, trarei opções como automações e suporte personalizado. Fique ligado! ✨`);
+                } else if (textoRecebido === '3') {
+                    enviarMensagem(numero, `Que tal conversarmos, ${nome}? Envie sua dúvida ou ideia, e te ajudarei com um toque especial de inovação! 📩`);
+                } else {
+                    enviarMensagem(numero, `Olá, ${nome}! Não reconheci seu comando. Tente:\n1️⃣ O que eu faço\n2️⃣ Serviços\n3️⃣ Contato\n4️⃣ Sair`);
+                }
             }
         }
     }
@@ -106,6 +109,8 @@ app.post('/webhook/chats-update', (req, res) => {
     console.log('Webhook recebido (chats.update):', JSON.stringify(req.body, null, 2));
     res.sendStatus(200);
 });
+
+app.get('/health', (req, res) => res.sendStatus(200));
 
 app.post('/webhook/contacts-update', (req, res) => {
     console.log('Webhook recebido (contacts.update):', JSON.stringify(req.body, null, 2));
